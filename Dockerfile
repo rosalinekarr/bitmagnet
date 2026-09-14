@@ -11,6 +11,16 @@ COPY . /build
 
 WORKDIR /build
 
+# r053 fork addition: a vet/test gate so CI catches a broken build or test
+# before it ever reaches the registry/Watchtower, not just a compile
+# failure - matters more now that Renovate can open PRs here. Runs here
+# (not as a separate CI step) because the CI runner uses docker-outside-
+# of-docker: a `docker run -v $PWD:...` step can't see the checkout, since
+# $PWD inside the job container doesn't resolve on the host's dockerd - but
+# `docker build`'s own context upload sidesteps that entirely.
+RUN go vet ./...
+RUN go test ./...
+
 RUN go build -ldflags "-s -w -X github.com/bitmagnet-io/bitmagnet/internal/version.GitTag=$(git describe --tags --always --dirty)"
 
 FROM alpine:3.24
