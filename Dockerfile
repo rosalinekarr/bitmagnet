@@ -25,6 +25,10 @@ COPY --from=build /build/bitmagnet /usr/bin/bitmagnet
 # r053 fork addition: bitmagnet has no _FILE convention for secrets, so wrap
 # its entrypoint to read the Postgres password from a mounted Docker secret
 # (mirrors the same pattern used by grafana/ and redis/ in the r053 repo).
-COPY --chmod=+x entrypoint.sh /entrypoint.sh
+# Plain COPY + chmod, not `COPY --chmod` - the r053 CI runner's `docker
+# build` doesn't have BuildKit enabled (classic builder), unlike `docker
+# compose build` which defaults to buildx.
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
