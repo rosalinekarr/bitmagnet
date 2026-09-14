@@ -1,0 +1,27 @@
+name: build-and-push
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: r053
+    # Sibling-container pattern: the job container already gets the host's
+    # docker socket bind-mounted in automatically (r053's gitea-runner/
+    # config.yaml lists it under container.valid_volumes for every job
+    # container on this label), so `docker build`/`push` below talk to the
+    # instance's own dockerd directly. Do NOT also request it here via a
+    # job-level `container: volumes:` - that produces a duplicate mount and
+    # the job container fails to even start.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to the local registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login localhost:5000 -u ci --password-stdin
+
+      - name: Build and push
+        run: |
+          docker build -t localhost:5000/bitmagnet:${{ gitea.sha }} -t localhost:5000/bitmagnet:latest .
+          docker push localhost:5000/bitmagnet:${{ gitea.sha }}
+          docker push localhost:5000/bitmagnet:latest

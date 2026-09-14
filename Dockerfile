@@ -22,4 +22,9 @@ RUN apk --update add \
 
 COPY --from=build /build/bitmagnet /usr/bin/bitmagnet
 
-ENTRYPOINT ["bitmagnet"]
+# r053 fork addition: bitmagnet has no _FILE convention for secrets, so wrap
+# its entrypoint to read the Postgres password from a mounted Docker secret
+# (mirrors the same pattern used by grafana/ and redis/ in the r053 repo).
+COPY --chmod=+x entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
