@@ -17,6 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Vet and test
+        # Same golang image/version as the Dockerfile's build stage, run
+        # standalone so a vet/test failure blocks the push below instead of
+        # only surfacing inside `docker build`'s own go build step (which
+        # doesn't run `go vet`/`go test` at all) - a real gate for automerged
+        # Renovate PRs, not just a compile check.
+        run: |
+          docker run --rm -v "$PWD":/build -w /build golang:1.25.14-alpine3.24 sh -c \
+            "apk add --no-cache gcc musl-dev git >/dev/null && go vet ./... && go test ./..."
+
       - name: Log in to the local registry
         run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login localhost:5000 -u ci --password-stdin
 
