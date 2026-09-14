@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["local>rosalinekarr/renovate-config"],
+  "packageRules": [
+    {
+      "description": "Merging to main here auto-deploys to production (own Gitea CI -> registry -> Watchtower) - a bigger blast radius than the personal sites this shared config was designed for, so every bump stays a manual review-and-merge, security-flagged or not. A top-level automerge:false alone does NOT override the shared preset's more specific devDependencies/vulnerabilityAlerts packageRules (later-matching rules win per-field, and a bare default isn't one) - this catch-all rule (no match conditions = matches everything) is appended after the extended preset's own rules, so it wins instead.",
+      "automerge": false
+    }
+  ]
+}
