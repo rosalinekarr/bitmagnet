@@ -3,7 +3,8 @@
   "extends": ["local>rosalinekarr/renovate-config"],
   "packageRules": [
     {
-      "description": "Merging to main here auto-deploys to production (own Gitea CI -> registry -> Watchtower) - a bigger blast radius than the personal sites this shared config was designed for, so every bump stays a manual review-and-merge, security-flagged or not. A top-level automerge:false alone does NOT override the shared preset's more specific devDependencies/vulnerabilityAlerts packageRules (later-matching rules win per-field, and a bare default isn't one) - this catch-all rule (no match conditions = matches everything) is appended after the extended preset's own rules, so it wins instead.",
+      "description": "Merging to main here auto-deploys to production (own Gitea CI -> registry -> Watchtower) - a bigger blast radius than the personal sites this shared config was designed for, so every bump stays a manual review-and-merge, security-flagged or not. A top-level automerge:false alone does NOT override the shared preset's more specific devDependencies/vulnerabilityAlerts packageRules (later-matching rules win per-field, and a bare default isn't one) - this catch-all rule (matchPackageNames wildcard = matches everything) is appended after the extended preset's own rules, so it wins instead. NOTE 2026-09-14: a bare packageRule with no match/exclude selector at all (the pattern the 4 no-CI repos originally used) is now rejected as invalid config by the current renovate/renovate:37 image - that schema got stricter at some point after those repos were set up, and all 4 have been silently unscanned since. matchPackageNames wildcard is the fix.",
+      "matchPackageNames": ["*"],
       "automerge": false
     }
   ]
